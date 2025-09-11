@@ -67,12 +67,37 @@ func xPath(node tree.Node, xpath string) (tree.NodeSet, error) {
 }
 
 // ParseOpenShellResponse ParseOpenShellResponse
-func ParseOpenShellResponse(response string) (string, error) {
+func ParseOpenShellResponse(response string) (shellId string, err error) {
+	defer func() {
+		if err != nil {
+			err = &ExecuteCommandError{Inner: err, Body: response}
+		}
+	}()
+
 	doc, err := xmltree.ParseXML(strings.NewReader(response))
 	if err != nil {
 		return "", err
 	}
-	return first(doc, "//w:Selector[@Name='ShellId']")
+
+	action, err := first(doc, "//a:Action")
+	if err != nil {
+		return "", fmt.Errorf("getting response action: %w", err)
+	}
+
+	switch action {
+	case "http://schemas.dmtf.org/wbem/wsman/1/wsman/fault":
+		return "", fmt.Errorf("error during shell creation")
+	case "http://schemas.xmlsoap.org/ws/2004/09/transfer/CreateResponse":
+		shellId, err := first(doc, "//rsp:ShellId")
+		if err != nil {
+			return "", fmt.Errorf("finding shell id: %w", err)
+		}
+
+		return shellId, nil
+
+	default:
+		return "", fmt.Errorf("unsupported action: %v", action)
+	}
 }
 
 // ParseExecuteCommandResponse ParseExecuteCommandResponse
