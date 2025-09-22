@@ -70,8 +70,7 @@ func newExecuteCommandError(response string, format string, args ...interface{})
 	return &ExecuteCommandError{fmt.Errorf(format, args...), response}
 }
 
-// ParseOpenShellResponse ParseOpenShellResponse
-func ParseOpenShellResponse(response string) (string, error) {
+func parseResponse(response, expectedAction, idXPath string) (string, error) {
 	doc, err := xmltree.ParseXML(strings.NewReader(response))
 	if err != nil {
 		return "", newExecuteCommandError(response, "parsing xml response: %w", err)
@@ -82,42 +81,33 @@ func ParseOpenShellResponse(response string) (string, error) {
 		return "", newExecuteCommandError(response, "getting response action: %w", err)
 	}
 
-	switch action {
-	case "http://schemas.dmtf.org/wbem/wsman/1/wsman/fault":
-		return "", newExecuteCommandError(response, "error during shell creation")
-	case "http://schemas.xmlsoap.org/ws/2004/09/transfer/CreateResponse":
-		shellId, err := first(doc, "//rsp:ShellId")
-		if err != nil {
-			return "", newExecuteCommandError(response, "finding shell id: %w", err)
-		}
-		return shellId, nil
-	default:
-		return "", newExecuteCommandError(response, "unsupported action: %v", action)
+	if action == "http://schemas.dmtf.org/wbem/wsman/1/wsman/fault" {
+		return "", newExecuteCommandError(response, "received error response")
 	}
+	if action == expectedAction {
+		id, err := first(doc, idXPath)
+		if err != nil {
+			return "", newExecuteCommandError(response, "finding %v: %w", idXPath, err)
+		}
+		return id, nil
+	}
+	return "", newExecuteCommandError(response, "unsupported action: %v", action)
 }
 
-// ParseExecuteCommandResponse ParseExecuteCommandResponse
+func ParseOpenShellResponse(response string) (string, error) {
+	return parseResponse(
+		response,
+		"http://schemas.xmlsoap.org/ws/2004/09/transfer/CreateResponse",
+		"//rsp:ShellId",
+	)
+}
+
 func ParseExecuteCommandResponse(response string) (string, error) {
-	doc, err := xmltree.ParseXML(strings.NewReader(response))
-	if err != nil {
-		return "", newExecuteCommandError(response, "parsing xml response: %w", err)
-	}
-
-	action, err := first(doc, "//a:Action")
-	if err != nil {
-		return "", newExecuteCommandError(response, "getting response action: %w", err)
-	}
-
-	switch action {
-	case "http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandResponse":
-		commandId, err := first(doc, "//rsp:CommandId")
-		if err != nil {
-			return "", newExecuteCommandError(response, "finding command id: %w", err)
-		}
-		return commandId, nil
-	default:
-		return "", newExecuteCommandError(response, "unsupported action: %v", action)
-	}
+	return parseResponse(
+		response,
+		"http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandResponse",
+		"//rsp:CommandId",
+	)
 }
 
 // ParseSlurpOutputErrResponse ParseSlurpOutputErrResponse
