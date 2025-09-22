@@ -66,69 +66,57 @@ func xPath(node tree.Node, xpath string) (tree.NodeSet, error) {
 	return nodes, nil
 }
 
-// ParseOpenShellResponse ParseOpenShellResponse
-func ParseOpenShellResponse(response string) (shellId string, err error) {
-	defer func() {
-		if err != nil {
-			err = &ExecuteCommandError{Inner: err, Body: response}
-		}
-	}()
+func newExecuteCommandError(response string, format string, args ...interface{}) *ExecuteCommandError {
+	return &ExecuteCommandError{fmt.Errorf(format, args...), response}
+}
 
+// ParseOpenShellResponse ParseOpenShellResponse
+func ParseOpenShellResponse(response string) (string, error) {
 	doc, err := xmltree.ParseXML(strings.NewReader(response))
 	if err != nil {
-		return "", err
+		return "", newExecuteCommandError(response, "parsing xml response: %w", err)
 	}
 
 	action, err := first(doc, "//a:Action")
 	if err != nil {
-		return "", fmt.Errorf("getting response action: %w", err)
+		return "", newExecuteCommandError(response, "getting response action: %w", err)
 	}
 
 	switch action {
 	case "http://schemas.dmtf.org/wbem/wsman/1/wsman/fault":
-		return "", fmt.Errorf("error during shell creation")
+		return "", newExecuteCommandError(response, "error during shell creation")
 	case "http://schemas.xmlsoap.org/ws/2004/09/transfer/CreateResponse":
 		shellId, err := first(doc, "//rsp:ShellId")
 		if err != nil {
-			return "", fmt.Errorf("finding shell id: %w", err)
+			return "", newExecuteCommandError(response, "finding shell id: %w", err)
 		}
-
 		return shellId, nil
-
 	default:
-		return "", fmt.Errorf("unsupported action: %v", action)
+		return "", newExecuteCommandError(response, "unsupported action: %v", action)
 	}
 }
 
 // ParseExecuteCommandResponse ParseExecuteCommandResponse
-func ParseExecuteCommandResponse(response string) (commandId string, err error) {
-	defer func() {
-		if err != nil {
-			err = &ExecuteCommandError{Inner: err, Body: response}
-		}
-	}()
-
+func ParseExecuteCommandResponse(response string) (string, error) {
 	doc, err := xmltree.ParseXML(strings.NewReader(response))
 	if err != nil {
-		return "", fmt.Errorf("parsing xml response: %w", err)
+		return "", newExecuteCommandError(response, "parsing xml response: %w", err)
 	}
 
 	action, err := first(doc, "//a:Action")
 	if err != nil {
-		return "", fmt.Errorf("getting response action: %w", err)
+		return "", newExecuteCommandError(response, "getting response action: %w", err)
 	}
 
 	switch action {
 	case "http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandResponse":
-		commandId, err = first(doc, "//rsp:CommandId")
+		commandId, err := first(doc, "//rsp:CommandId")
 		if err != nil {
-			return "", fmt.Errorf("finding command id: %w", err)
+			return "", newExecuteCommandError(response, "finding command id: %w", err)
 		}
-
 		return commandId, nil
-
 	default:
-		return "", fmt.Errorf("unsupported action: %v", action)
+		return "", newExecuteCommandError(response, "unsupported action: %v", action)
 	}
 }
 
