@@ -49,6 +49,40 @@ var (
 	</s:Body>
 	</s:Envelope>`
 
+	createShellResponseWithError = `<s:Envelope xml:lang="en-US"
+	xmlns:s="http://www.w3.org/2003/05/soap-envelope"
+	xmlns:a="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+	xmlns:x="http://schemas.xmlsoap.org/ws/2004/09/transfer"
+	xmlns:e="http://schemas.xmlsoap.org/ws/2004/08/eventing"
+	xmlns:n="http://schemas.xmlsoap.org/ws/2004/09/enumeration"
+	xmlns:w="http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd"
+	xmlns:p="http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd">
+	<s:Header>
+	    <a:Action>http://schemas.dmtf.org/wbem/wsman/1/wsman/fault</a:Action>
+	    <a:MessageID>uuid:0A888267-33ED-4F08-98E6-DDEBDE2067DE</a:MessageID>
+	    <a:To>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:To>
+	    <a:RelatesTo>uuid:1893210b-91a7-45dc-aa90-b0c42e0dd740</a:RelatesTo>
+	</s:Header>
+	<s:Body>
+	    <s:Fault>
+	        <s:Code>
+	            <s:Value>s:Receiver</s:Value>
+	            <s:Subcode><s:Value>w:InternalError</s:Value></s:Subcode>
+	        </s:Code>
+	        <s:Reason>
+	            <s:Text xml:lang="en-US">Illegal operation attempted on a registry key that has been marked for deletion. </s:Text>
+	        </s:Reason>
+	        <s:Detail>
+	            <f:WSManFault xmlns:f="http://schemas.microsoft.com/wbem/wsman/1/wsmanfault" Code="2147943418" Machine="34.134.189.249">
+	                <f:Message>
+	                    <f:ProviderFault provider="Shell cmd plugin" path="%!s(MISSING)ystemroot%!\(MISSING)system32\winrscmd.dll">Illegal operation attempted on a registry key that has been marked for deletion. </f:ProviderFault>
+	                </f:Message>
+	            </f:WSManFault>
+	        </s:Detail>
+	    </s:Fault>
+	</s:Body>
+	</s:Envelope>`
+
 	executeCommandResponse = `<s:Envelope xml:lang="en-US" xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:x="http://schemas.xmlsoap.org/ws/2004/09/transfer" xmlns:w="http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd" xmlns:rsp="http://schemas.microsoft.com/wbem/wsman/1/windows/shell" xmlns:p="http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd"><s:Header><a:Action>http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandResponse</a:Action><a:MessageID>uuid:D9E108AA-E32B-45E3-8601-E9C70999D3BA</a:MessageID><a:To>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:To><a:RelatesTo>uuid:F530804C-6D02-4FA9-AE78-1997750594BA</a:RelatesTo></s:Header><s:Body><rsp:CommandResponse><rsp:CommandId>1A6DEE6B-EC68-4DD6-87E9-030C0048ECC4</rsp:CommandId></rsp:CommandResponse></s:Body></s:Envelope>`
 
 	executeCommandResponseWithError = `<s:Envelope xml:lang="en-US" xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:x="http://schemas.xmlsoap.org/ws/2004/09/transfer" xmlns:e="http://schemas.xmlsoap.org/ws/2004/08/eventing" xmlns:n="http://schemas.xmlsoap.org/ws/2004/09/enumeration" xmlns:w="http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd" xmlns:p="http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd"><s:Header><a:Action>http://schemas.dmtf.org/wbem/wsman/1/wsman/fault</a:Action><a:MessageID>uuid:C85E435B-712E-45E8-AC64-C53F9FEE7164</a:MessageID><a:To>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:To><a:RelatesTo>uuid:23d79ab4-f145-4ac5-baa3-084d67265a24</a:RelatesTo></s:Header><s:Body><s:Fault><s:Code><s:Value>s:Receiver</s:Value><s:Subcode><s:Value>w:InternalError</s:Value></s:Subcode></s:Code><s:Reason><s:Text xml:lang="">The filename or extension is too long. </s:Text></s:Reason><s:Detail><f:WSManFault xmlns:f="http://schemas.microsoft.com/wbem/wsman/1/wsmanfault" Code="2147942606" Machine="52.12.219.136"><f:Message><f:ProviderFault provider="Shell cmd plugin" path="%systemroot%\system32\winrscmd.dll">The filename or extension is too long. </f:ProviderFault></f:Message></f:WSManFault></s:Detail></s:Fault></s:Body></s:Envelope>`
