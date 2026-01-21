@@ -1,24 +1,39 @@
-# WinRM for Go
+# WinRM for Go (Maintained Fork)
 
-_Note_: if you're looking for the `winrm` command-line tool, this has been splitted from this project and is available at [winrm-cli](https://github.com/masterzen/winrm-cli)
+> **Note:** This is a maintained fork of [masterzen/winrm](https://github.com/masterzen/winrm) with active maintenance, security updates, and bug fixes.
 
 This is a Go library to execute remote commands on Windows machines through
 the use of WinRM/WinRS.
 
-_Note_: this library doesn't support domain users (it doesn't support GSSAPI nor Kerberos). It's primary target is to execute remote commands on EC2 windows machines.
+## Why This Fork?
 
-[![Build Status](https://travis-ci.org/masterzen/winrm.svg?branch=master)](https://travis-ci.org/masterzen/winrm)
-[![Coverage Status](https://coveralls.io/repos/masterzen/winrm/badge.png)](https://coveralls.io/r/masterzen/winrm)
+The upstream `masterzen/winrm` library receives infrequent updates. This fork provides:
+
+- 🔒 **Security updates** - Timely dependency updates
+- 🐛 **Bug fixes** - Merged community fixes
+- ✨ **Unicode support** - Proper UTF-16 encoding for PowerShell commands
+- 🔧 **Active maintenance** - Regular updates and issue triage
+
+## Installation
+
+```bash
+go get github.com/JohanVanosmaelAcerta/go-winrm
+```
+
+## Requirements
+
+- Go 1.25+
 
 ## Contact
 
-- Bugs: https://github.com/masterzen/winrm/issues
+- Bugs: https://github.com/JohanVanosmaelAcerta/go-winrm/issues
+- Upstream: https://github.com/masterzen/winrm
 
 
 ## Getting Started
 WinRM is available on Windows Server 2008 and up. This project natively supports basic authentication for local accounts, see the steps in the next section on how to prepare the remote Windows machine for this scenario. The authentication model is pluggable, see below for an example on using Negotiate/NTLM authentication (e.g. for connecting to vanilla Azure VMs) or Kerberos authentication (using domain accounts).
 
-_Note_: This library only supports Golang 1.7+
+_Note_: This library only supports Go 1.25+
 
 ### Preparing the remote Windows machine for Basic authentication
 This project supports only basic authentication for local accounts (domain users are not supported). The remote windows system must be prepared for winrm:

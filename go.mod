@@ -1,6 +1,6 @@
-module github.com/masterzen/winrm
+module github.com/JohanVanosmaelAcerta/go-winrm
 
-go 1.21
+go 1.25
 
 require (
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358
